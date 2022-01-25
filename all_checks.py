@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, shutil, socket
+import os, sys, shutil, socket, psutil
 
 
 def check_reboot():
@@ -24,6 +24,11 @@ def check_root_full():
     return check_disk_full(disk='/', min_gb=2, min_percent=10)
 
 
+def check_cpu_constrained():
+    """Returns True if the cpu is having too much usage, False otherwise."""
+    return psutil.cpu_percent(1) > 75
+
+
 def check_no_network():
     """Returns True if it fails to resolve Google's URL, False otherwise"""
     try:
@@ -38,6 +43,7 @@ def main():
         (check_reboot, "Pending Reboot"),
         (check_root_full, "Root partition full"),
         (check_no_network, "No working network"),
+        (check_cpu_constrained, "CPU load too high."),
     ]
 
     everything_ok = True
